@@ -1,0 +1,20 @@
+body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+/*
+.frmmain {
+    width: 100%;
+    min-width: 410px;
+    height: 100vh;
+    min-height: 325px;
+    position: relative;
+    overflow: hidden;
+    margin-top: -1px;
+    margin-left: -1px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: rgba(255, 255, 255, 1.0);
+}
+*/
