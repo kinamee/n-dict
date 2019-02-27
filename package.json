@@ -1,0 +1,19 @@
+{
+  "name": "n-dic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "4.0.6",
+    "electron-reload": "^1.4.0"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
+}
