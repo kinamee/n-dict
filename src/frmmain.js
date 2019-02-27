@@ -12,7 +12,8 @@ webview.addEventListener('dom-ready', () => {
   //webview.insertCSS('body { overflow-y: hidden; }')
 
   webview.focus()
-  webview.setZoomLevel(-1);
+  webview.insertCSS('body::-webkit-scrollbar { display: none; }')
+  webview.setZoomLevel(0);
   webview.executeJavaScript('document.getElementById("main_input").focus();')
 })
 
