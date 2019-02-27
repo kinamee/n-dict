@@ -8,6 +8,7 @@ const url = require('url')
 let win
 
 function createWindow () {
+
   // create the browser window.
   win = new BrowserWindow({
     webPreferences: {
@@ -17,6 +18,7 @@ function createWindow () {
     width: 420, height: 610
   })
   win.setResizable(false)
+  app.dock.hide();
 
   // and load the tdd_main.html of the app.
   win.loadURL(url.format({
@@ -40,7 +42,8 @@ function createWindow () {
 app.on('ready', () => {
   createWindow()
 
-  tray = new Tray('/path/to/my/icon') // 현재 애플리케이션 디렉터리를 기준으로 하려면 `__dirname + '/images/tray.png'` 형식으로 입력해야 합니다.
+  // 현재 애플리케이션 디렉터리를 기준으로 하려면 `__dirname + '/images/tray.png'` 형식으로 입력해야 합니다.
+  tray = new Tray('/path/to/my/icon')
   const contextMenu = Menu.buildFromTemplate([
     {label: 'Item1', type: 'radio'},
     {label: 'Item2', type: 'radio'},
