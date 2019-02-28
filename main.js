@@ -1,6 +1,6 @@
 
 require('electron-reload')(__dirname, { electron: require('/Users/admin/Script/electron/n-dic/node_modules/electron') })
-const {app, BrowserWindow, Tray} = require('electron')
+const {app, BrowserWindow, Tray, Menu} = require('electron')
 const ipc_main = require('electron').ipcMain
 const path = require('path')
 const url = require('url')
@@ -42,8 +42,13 @@ function createWindow () {
 app.on('ready', () => {
   createWindow()
 
-  // 현재 애플리케이션 디렉터리를 기준으로 하려면 `__dirname + '/images/tray.png'` 형식으로 입력해야 합니다.
-  tray = new Tray('/path/to/my/icon')
+  /* create menu icon */
+  const trayIcon = path.join(__dirname, '/icon/ndic_ico.png')
+  const nativeImage = require('electron').nativeImage
+  const nimage = nativeImage.createFromPath(trayIcon)
+
+  /* create menu */
+  tray = new Tray(nimage)
   const contextMenu = Menu.buildFromTemplate([
     {label: 'Item1', type: 'radio'},
     {label: 'Item2', type: 'radio'},
@@ -52,6 +57,9 @@ app.on('ready', () => {
   ])
   tray.setToolTip('이것은 나의 애플리케이션 입니다!')
   tray.setContextMenu(contextMenu)
+
+  /* hide main window */
+  /* win.mainWindow.hide(); */
 })
 
 app.on('window-all-closed', () => {
