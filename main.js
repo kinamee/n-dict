@@ -50,12 +50,22 @@ app.on('ready', () => {
   /* create menu */
   tray = new Tray(nimage)
   const contextMenu = Menu.buildFromTemplate([
-    {label: 'Item1', type: 'radio'},
-    {label: 'Item2', type: 'radio'},
-    {label: 'Item3', type: 'radio', checked: true},
-    {label: 'Item4', type: 'radio'}
+    {label: 'Settings', click() {
+        /* open settings */
+      }
+    },
+    {label: 'About', click() {
+        /* open about dialog */
+      }
+    },
+    {type: 'separator'},
+    {label: 'Quit', click() {
+        app.quit()
+      },
+      accelerator: 'CmdOrCtrl+Q'
+    }
   ])
-  tray.setToolTip('이것은 나의 애플리케이션 입니다!')
+  tray.setToolTip('Nadict')
   tray.setContextMenu(contextMenu)
 
   /* hide main window */
