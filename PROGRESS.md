@@ -6,7 +6,7 @@
 
  /*
  * 환경설정 팝업 윈도우 만들기
- *
+ * 진행중: 스케치 + 코딩 (frmsetting.html+frmsetting.js)
  */
 
  /*
