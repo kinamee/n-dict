@@ -9,6 +9,10 @@
  * 진행중: 스케치 + 코딩 (frmsetting.html+frmsetting.js)
  */
 
+Things that are added to frmsetting.js
+- need to be tested to see if input shortcut can be displayed
+- need to be tested to see if input shortcut can be verified, stored and loaded
+
  /*
  * 실행단축키 적용하기
  */
