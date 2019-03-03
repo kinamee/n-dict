@@ -52,7 +52,7 @@ $('.txtshortcut').click(function(){
 
         // sequence is an array like ['ctrl+k', 'c']
         shortcut = sequence.join('+')
-        shortcut = shortcut.toUpperCase().replace('META', 'CMD')
+        shortcut = shortcut.toUpperCase().replace(/META/g, 'CMD')
 
         $('.txtshortcut').text(shortcut)
         console.log(shortcut)

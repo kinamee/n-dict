@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "electron-json-storage": "^4.1.6",
+    "electron-log": "^3.0.1",
     "jquery": "^3.3.1"
   }
 }
