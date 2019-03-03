@@ -12,12 +12,13 @@ function createWindow () {
   // create the browser window.
   win = new BrowserWindow({
     webPreferences: {
-    devTools: false
+    devTools: true
     },
     frame: false,
     width: 420, height: 610
   })
   win.setResizable(false)
+  // win.webContents.openDevTools()
   // app.dock.hide();
 
   // and load the tdd_main.html of the app.

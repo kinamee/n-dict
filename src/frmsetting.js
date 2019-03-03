@@ -37,8 +37,27 @@ function design_init() {
   /* mouse pointer to default */
   $('.grpbtnconfirm').css({ 'cursor': 'default' })
   $('.txtshortcut').css({ 'cursor': 'default' })
-
 }
+
+/* shortcut recording */
+$('.txtshortcut').click(function(){
+    //console.log('key recording..')
+    $(this).text('Press any shortcut')
+    $('.txtmessage').css({ 'font-size': '14.0px' })
+    $('.txtmessage').text('I\'m recording your key press..')
+
+    mousetrap.record(function(sequence) {
+        $('.txtmessage').css({ 'font-size': '15.0px' })
+        $('.txtmessage').text('Shortcut to open nadict')
+
+        // sequence is an array like ['ctrl+k', 'c']
+        shortcut = sequence.join('+')
+        shortcut = shortcut.toUpperCase().replace('META', 'CMD')
+
+        $('.txtshortcut').text(shortcut)
+        console.log(shortcut)
+    });
+})
 
 /* check and create config file */
 function config_file_exist() {
