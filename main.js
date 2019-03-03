@@ -53,7 +53,11 @@ app.on('ready', () => {
     {label: 'Settings', click() {
         /* open settings */
         const modalPath = path.join('file://', __dirname, 'src/frmsetting.html')
-        let win_setting = new BrowserWindow({ frame: false, width: 260, height: 180 })
+        let win_setting = new BrowserWindow({
+          frame: false,
+          width: 260, height: 180,
+          'web-preferences': {'web-security': false}
+        })
         win_setting.on('close', function () { win_setting = null })
         win_setting.loadURL(modalPath)
         win_setting.show()
