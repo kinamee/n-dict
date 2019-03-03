@@ -1,19 +1,30 @@
-const { electron, globalShortcut } = require('electron')
+
+const electron = require('electron')
 const path = require('path')
 const remote = electron.remote
 const ipc_renderer = electron.ipcRenderer
+const globalShortcut = require('electron')
+
+let $ = require('jquery')
 
 /* storage setting */
 const schedule_file_path = path.join(__dirname, 'schedule.json')
 const storage = require('electron-json-storage');
 storage.setDataPath(schedule_file_path);
 
-
 /* document ready */
 $(document).ready(function() {
+    /* design init */
+    design_init()
+
     /* check config file */
     config_file_exist()
  })
+
+/* design init */
+function design_init() {
+  $('.grpbtnconfirm').css({ 'cursor': 'default' })
+}
 
 /* check and create config file */
 function config_file_exist() {
@@ -58,7 +69,7 @@ function verify_shortcut(pstr_shortcut) {
 }
 
 /* input shortcut config */
-var inp_shortcut = document.getElementsByClassName("keypressinput")[0];
+var inp_shortcut = document.getElementsByClassName("textshiftcmdaltp")[0];
 inp_shortcut.addEventListener ('keydown',  reportKeyEvent);
 function reportKeyEvent (event) {
     var reportStr   =
@@ -70,7 +81,7 @@ function reportKeyEvent (event) {
         event.code + " " +
         "key was pressed."
 
-    $(".keypressinput").text (reportStr)
+    $(".textshiftcmdaltp").text (reportStr)
 
     /* was a ctrl-llt-E combo pressed?
     if (event.ctrlKey  &&  event.altKey  &&  event.code === "KeyE") {
