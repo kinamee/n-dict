@@ -3,7 +3,7 @@ const path = require('path')
 const remote = electron.remote
 const BrowserWindow = electron.remote.BrowserWindow
 const ipc_renderer = electron.ipcRenderer
-const log = require('electron-log')
+//const log = require('electron-log')
 
 /* jquery and jquery-ui */
 let $ = require('jquery')
@@ -22,5 +22,5 @@ webview.addEventListener('dom-ready', () => {
 
 /* document ready */
 $(document).ready(function() {
-    console.log('document ready')
+    //console.log('document ready')
 })

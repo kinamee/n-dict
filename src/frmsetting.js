@@ -3,8 +3,8 @@ const electron = require('electron')
 const path = require('path')
 const remote = electron.remote
 const ipc_renderer = electron.ipcRenderer
-const log = require('electron-log')
-log.info('electron-log is on, frmsetting')
+//const log = require('electron-log')
+//log.info('electron-log is on, frmsetting')
 
 /* jquery and jquery-ui */
 let $ = require('jquery')
@@ -53,7 +53,7 @@ $('.txtshortcut').click(function(){
         shortcut_from_user = shortcut_from_user.toUpperCase().replace(/META/g, 'CMD')
 
         $('.txtshortcut').text(shortcut_from_user)
-        log.info(shortcut_from_user)
+        //log.info(shortcut_from_user)
 
         /* send main.js to register a new shortcut */
         ipc_renderer.send('setting-to-main', shortcut_from_user)
@@ -67,9 +67,15 @@ function return_back_to_original_message() {
 
 /* verify shortcut */
 function verify_shortcut(pstr_shortcut) {
-    console.log('message to main "re-register shortcut and let me know if its completed"')
+    //console.log('message to main "re-register shortcut and let me know if its completed"')
 }
 
+/* close */
+$('.grpbtnconfirm').click(function(){
+    var window = remote.getCurrentWindow();
+    window.hide();
+})
+
 ipc_renderer.on('main-to-setting', function (event, arg) {
-  console.log('ipc-to-tdd message received: ' + arg)
+  //console.log('ipc-to-tdd message received: ' + arg)
 })

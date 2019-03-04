@@ -1,4 +1,3 @@
-require('electron-reload')(__dirname, { electron: require('/Users/admin/Script/electron/n-dic/node_modules/electron') })
 
 const { app, globalShortcut, BrowserWindow, Tray, Menu } = require('electron')
 const ipc_main = require('electron').ipcMain
@@ -6,8 +5,8 @@ const path = require('path')
 const url = require('url')
 
 /* logger setting */
-const log = require('electron-log')
-log.info('electron-log is on')
+//const log = require('electron-log')
+//log.info('electron-log is on')
 /*
 const fs = require('fs');
 log.transports.file.format = '{h}:{i}:{s}:{ms} {text}'
@@ -34,7 +33,7 @@ function createWindow() {
     /* [01] create dictionary window */
     win_dict = new BrowserWindow({
         webPreferences: {
-            devTools: true
+            devTools: false
         },
         frame: false,
         width: 420,
@@ -42,7 +41,7 @@ function createWindow() {
     })
     win_dict.setResizable(false)
     // win.webContents.openDevTools()
-    // app.dock.hide();
+    app.dock.hide();
 
     // and load the tdd_main.html of the app.
     win_dict.loadURL(url.format({
@@ -61,9 +60,27 @@ function createWindow() {
         win_dict = null
     })
 
+    win_dict.on('focus', () => {
+        //log.info('win_dict.unfocused')
+        const ret = globalShortcut.register('ESC', () => {
+            /* show dictionary on shortcut pressed*/
+            win_dict.hide()
+        })
+    });
+
+    win_dict.on('blur', () => {
+        //log.info('win_dict.unfocused')
+        globalShortcut.unregister('ESC')
+        win_dict.hide()
+    })
+
+
     /* [02] create dictionary window */
     const modalPath = path.join('file://', __dirname, 'src/frmsetting.html')
     win_setting = new BrowserWindow({
+        webPreferences: {
+            devTools: false
+        },
         frame: false,
         width: 260,
         height: 180,
@@ -80,8 +97,9 @@ function createWindow() {
 
 /* entry point */
 app.on('ready', () => {
+
     shortcut_from_config = config_file_exist()
-    console.log('app.on shortcut from config: ' + shortcut_from_config)
+    //console.log('app.on shortcut from config: ' + shortcut_from_config)
     createWindow()
 
     /* create menu icon */
@@ -96,14 +114,13 @@ app.on('ready', () => {
             label: 'Show Dictionary',
             click() {
                 /* open dictionary */
-                win_dict.show()
+                open_dict()
             }
         },
         {
             label: 'Settings',
             click() {
                 /* open settings */
-                win_setting.openDevTools()
                 win_setting.show()
            }
         },
@@ -126,16 +143,16 @@ app.on('ready', () => {
     tray.setContextMenu(contextMenu)
 
     /* register shortcut */
-    console.log(shortcut_from_config + ' from config')
+    //console.log(shortcut_from_config + ' from config')
     const ret = globalShortcut.register(shortcut_from_config, () => {
-        console.log(shortcut_from_config + ' is pressed on main')
+        //console.log(shortcut_from_config + ' is pressed on main')
         /* show dictionary on shortcut pressed*/
-        win_dict.show()
+        open_dict()
     })
     if (ret) {
-        console.log('globalshortcut setting completed: ' + ret)
+        //console.log('globalshortcut setting completed: ' + ret)
     } else {
-        console.log('Shortcut registration failed')
+        //console.log('Shortcut registration failed')
     }
 })
 
@@ -143,7 +160,7 @@ app.on('will-quit', () => {
   // Unregister a shortcut.
   shortcut_from_config = storage.get('shortcut')
   globalShortcut.unregister(shortcut_from_config)
-  console.log(shortcut_from_config + ' is unregistered')
+  //console.log(shortcut_from_config + ' is unregistered')
 })
 
 app.on('window-all-closed', () => {
@@ -155,38 +172,39 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
     if (win_dict === null) {
         createWindow()
+
     }
 })
 
 ipc_main.on('setting-to-main', function(event, arg) {
 
     /* message is received from seeting view */
-    console.log('here, main.js - <setting-to-main>: ' + arg)
+    //console.log('here, main.js - <setting-to-main>: ' + arg)
     shortcut_from_config = storage.get('shortcut')
     globalShortcut.unregister(shortcut_from_config)
-    console.log('unregistered: ' + shortcut_from_config)
+    //console.log('unregistered: ' + shortcut_from_config)
 
     /* registeration for new shortcut */
     storage.set('shortcut', arg)
     const ret = globalShortcut.register(arg, () => {
         /* show dictionary on shortcut pressed*/
-        win_dict.show()
+        open_dict()
 
         storage.set('shortcut', arg)
         shortcut_from_config = arg
     })
     if (ret) {
-        console.log('globalshortcut setting completed: ' + ret)
+        //console.log('globalshortcut setting completed: ' + ret)
     } else {
         /* send a message to setting view */
         win_setting.webContents.send('setting-to-main', 'shortcut registration failed')
 
-        console.log('Shortcut registration failed')
+        //console.log('Shortcut registration failed')
         /* return back to original shortcut */
         storage.set('shortcut', shortcut_from_config)
         const ret = globalShortcut.register(shortcut_from_config, () => {
             /* show dictionary on shortcut pressed*/
-            win_dict.show()
+            open_dict()
         })
     }
 
@@ -196,10 +214,29 @@ ipc_main.on('setting-to-main', function(event, arg) {
 function config_file_exist() {
     shortcut = storage.get('shortcut')
     if (!shortcut) {
-        console.log('shortcut is not found')
+        //console.log('shortcut is not found')
         storage.set('shortcut', 'CMD+SHIFT+ALT+P')
         return 'CMD+SHIFT+ALT+P'
     }
     return shortcut
 }
+
+function open_dict() {
+
+    /* display screen */
+    var screenElectron = require('electron').screen;
+    var mainScreen = screenElectron.getPrimaryDisplay();
+    screen_height = mainScreen.workArea.height
+
+    var win_size = win_dict.getSize()
+    window_height = win_size[1]
+    win_dict.setPosition(0, screen_height-window_height);
+
+    /* show and hide toggle */
+    if (win_dict.isVisible())
+        win_dict.hide()
+    else
+        win_dict.show()
+}
+
 
