@@ -1,26 +1,37 @@
 require('electron-reload')(__dirname, { electron: require('/Users/admin/Script/electron/n-dic/node_modules/electron') })
+
 const { app, globalShortcut, BrowserWindow, Tray, Menu } = require('electron')
 const ipc_main = require('electron').ipcMain
 const path = require('path')
 const url = require('url')
-const fs = require('fs');
 
+/* logger setting */
 const log = require('electron-log')
+log.info('electron-log is on')
+/*
+const fs = require('fs');
 log.transports.file.format = '{h}:{i}:{s}:{ms} {text}'
 log.transports.file.maxSize = 5 * 1024 * 1024
 log.transports.file.level = 'info'
-log.transports.file.file = __dirname + '/nadict.log'
+log.transports.file.file = __dirname + '/app-log.txt'
 log.transports.file.streamConfig = { flags: 'w' };
-log.transports.file.stream = fs.createWriteStream('log.txt')
+log.transports.file.stream = fs.createWriteStream('app-log.txt')
 log.appName = 'nadict'
-log.info('electron-log is on')
+*/
 
+/* storage setting */
+const store = require('electron-store');
+const storage = new store();
+let shortcut_from_config
+
+/* windows references */
 let win_dict
 let win_setting
 
+/* create windows */
 function createWindow() {
 
-    /* create dictionary window */
+    /* [01] create dictionary window */
     win_dict = new BrowserWindow({
         webPreferences: {
             devTools: true
@@ -50,7 +61,7 @@ function createWindow() {
         win_dict = null
     })
 
-    /* create dictionary window */
+    /* [02] create dictionary window */
     const modalPath = path.join('file://', __dirname, 'src/frmsetting.html')
     win_setting = new BrowserWindow({
         frame: false,
@@ -67,7 +78,10 @@ function createWindow() {
     })
 }
 
+/* entry point */
 app.on('ready', () => {
+    shortcut_from_config = config_file_exist()
+    console.log('app.on shortcut from config: ' + shortcut_from_config)
     createWindow()
 
     /* create menu icon */
@@ -89,6 +103,7 @@ app.on('ready', () => {
             label: 'Settings',
             click() {
                 /* open settings */
+                win_setting.openDevTools()
                 win_setting.show()
            }
         },
@@ -110,23 +125,25 @@ app.on('ready', () => {
     tray.setToolTip('Nadict')
     tray.setContextMenu(contextMenu)
 
-    /* hide main window */
-    /* win.mainWindow.hide(); */
-
     /* register shortcut */
-    const ret = globalShortcut.register('Cmd+Shift+Alt+P', () => {
-        log.info('Cmd+Shift+Alt+P is pressed')
+    console.log(shortcut_from_config + ' from config')
+    const ret = globalShortcut.register(shortcut_from_config, () => {
+        console.log(shortcut_from_config + ' is pressed on main')
+        /* show dictionary on shortcut pressed*/
+        win_dict.show()
     })
     if (ret) {
-        log.info('globalshortcut setting completed: ' + ret)
+        console.log('globalshortcut setting completed: ' + ret)
     } else {
-        log.info('Shortcut registration failed')
+        console.log('Shortcut registration failed')
     }
 })
 
 app.on('will-quit', () => {
   // Unregister a shortcut.
-  globalShortcut.unregister('Cmd+Shift+Alt+P')
+  shortcut_from_config = storage.get('shortcut')
+  globalShortcut.unregister(shortcut_from_config)
+  console.log(shortcut_from_config + ' is unregistered')
 })
 
 app.on('window-all-closed', () => {
@@ -136,12 +153,53 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-    if (win === null) {
+    if (win_dict === null) {
         createWindow()
     }
 })
 
-ipc_main.on('ipc-to-main', function(event, arg) {
-    // delever ipc message to binding page tdd.js
-    win.webContents.send('ipc-to-tdd', arg)
+ipc_main.on('setting-to-main', function(event, arg) {
+
+    /* message is received from seeting view */
+    console.log('here, main.js - <setting-to-main>: ' + arg)
+    shortcut_from_config = storage.get('shortcut')
+    globalShortcut.unregister(shortcut_from_config)
+    console.log('unregistered: ' + shortcut_from_config)
+
+    /* registeration for new shortcut */
+    storage.set('shortcut', arg)
+    const ret = globalShortcut.register(arg, () => {
+        /* show dictionary on shortcut pressed*/
+        win_dict.show()
+
+        storage.set('shortcut', arg)
+        shortcut_from_config = arg
+    })
+    if (ret) {
+        console.log('globalshortcut setting completed: ' + ret)
+    } else {
+        /* send a message to setting view */
+        win_setting.webContents.send('setting-to-main', 'shortcut registration failed')
+
+        console.log('Shortcut registration failed')
+        /* return back to original shortcut */
+        storage.set('shortcut', shortcut_from_config)
+        const ret = globalShortcut.register(shortcut_from_config, () => {
+            /* show dictionary on shortcut pressed*/
+            win_dict.show()
+        })
+    }
+
 })
+
+/* if not exist, create config json with shortcut whose default value is CMD+SHIFT+ALT+P */
+function config_file_exist() {
+    shortcut = storage.get('shortcut')
+    if (!shortcut) {
+        console.log('shortcut is not found')
+        storage.set('shortcut', 'CMD+SHIFT+ALT+P')
+        return 'CMD+SHIFT+ALT+P'
+    }
+    return shortcut
+}
+

@@ -3,13 +3,15 @@ const path = require('path')
 const remote = electron.remote
 const BrowserWindow = electron.remote.BrowserWindow
 const ipc_renderer = electron.ipcRenderer
+const log = require('electron-log')
 
+/* jquery and jquery-ui */
 let $ = require('jquery')
-const webview = document.getElementById('webview')
 
+/* document load completed */
+const webview = document.getElementById('webview')
 webview.addEventListener('dom-ready', () => {
   //webview.openDevTools()
-  //webview.insertCSS('body { overflow-y: hidden; }')
 
   webview.focus()
   webview.insertCSS('body::-webkit-scrollbar { display: none; }')
@@ -18,9 +20,7 @@ webview.addEventListener('dom-ready', () => {
 
 })
 
-/*
- * document ready
- */
+/* document ready */
 $(document).ready(function() {
     console.log('document ready')
 })

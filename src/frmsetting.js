@@ -3,34 +3,32 @@ const electron = require('electron')
 const path = require('path')
 const remote = electron.remote
 const ipc_renderer = electron.ipcRenderer
-const globalShortcut = require('electron')
+const log = require('electron-log')
+log.info('electron-log is on, frmsetting')
 
-const mousetrap = require(path.resolve('src/js/mousetrap-master/mousetrap.js'));
+/* jquery and jquery-ui */
+let $ = require('jquery')
+
+/* mousetrap for shortcut recording */
+const mousetrap = require(path.resolve('src/js/mousetrap-master/mousetrap.js'))
 require(path.resolve('src/js/mousetrap-master/plugins/bind-dictionary/mousetrap-bind-dictionary.js'))
 require(path.resolve('src/js/mousetrap-master/plugins/global-bind/mousetrap-global-bind.js'))
 require(path.resolve('src/js/mousetrap-master/plugins/pause/mousetrap-pause.js'))
 require(path.resolve('src/js/mousetrap-master/plugins/record/mousetrap-record.js'))
 
-let $ = require('jquery')
-
 /* storage setting */
-const config_file_path = path.join(__dirname, 'config')
-const storage = require('electron-json-storage');
-storage.setDataPath(config_file_path);
-
-/* global key bind */
-mousetrap.bindGlobal('ctrl+shift', function() {
-    console.log('ctrl+shift')
-});
+const store = require('electron-store');
+const storage = new store();
 
 /* document ready */
 $(document).ready(function() {
     /* design init */
     design_init()
 
-    /* check config file */
-    config_file_exist()
- })
+    /* load shortcut from config */
+    shortcut_from_config = storage.get('shortcut')
+    $('.txtshortcut').text(shortcut_from_config)
+})
 
 /* design init */
 function design_init() {
@@ -51,53 +49,27 @@ $('.txtshortcut').click(function(){
         $('.txtmessage').text('Shortcut to open nadict')
 
         // sequence is an array like ['ctrl+k', 'c']
-        shortcut = sequence.join('+')
-        shortcut = shortcut.toUpperCase().replace(/META/g, 'CMD')
+        shortcut_from_user = sequence.join('+')
+        shortcut_from_user = shortcut_from_user.toUpperCase().replace(/META/g, 'CMD')
 
-        $('.txtshortcut').text(shortcut)
-        console.log(shortcut)
-    });
+        $('.txtshortcut').text(shortcut_from_user)
+        log.info(shortcut_from_user)
+
+        /* send main.js to register a new shortcut */
+        ipc_renderer.send('setting-to-main', shortcut_from_user)
+    })
 })
 
-/* check and create config file */
-function config_file_exist() {
-    storage.has('shortcut', function(error, hasKey) {
-        if (error) throw error
-        if (hasKey) {
-            console.log('exist')
-        } else {
-            console.log('does not exist')
-            storage.set('shortcut', 'CMD+SHIFT+OPT+P', function(error) {
-                if (error) throw error;
-                console.log('created for shortcut')
-            })
-        }
-    })
-}
-
-/* save shortcut to config file */
-function save_shortcut_to_storage(pstr_shortcut) {
-    /* storage.set('shortcut', 'CMD+SHIFT+OPT+P', function(error) { */
-    storage.set('shortcut', pstr_shortcut, function(error) {
-        if (error) throw error;
-        console.log('created for shortcut')
-    })
+function return_back_to_original_message() {
+    $('.txtmessage').css({ 'font-size': '15.0px' })
+    $('.txtmessage').text('Shortcut to open nadict')
 }
 
 /* verify shortcut */
 function verify_shortcut(pstr_shortcut) {
-    /* example */
-    /* CommandOrControl+A */
-    /* Command+Shift+Z */
-    /* const ret = globalShortcut.register('CommandOrControl+Shift+Option+P', () => { */
-    const ret = globalShortcut.register(pstr_shortcut, () => {
-        console.log('CommandOrControl+Shift+Option+P is pressed')
-        return true
-    })
-
-    if (!ret) {
-        console.log('registration failed')
-        return false
-    }
+    console.log('message to main "re-register shortcut and let me know if its completed"')
 }
 
+ipc_renderer.on('main-to-setting', function (event, arg) {
+  console.log('ipc-to-tdd message received: ' + arg)
+})

@@ -14,8 +14,8 @@
     "electron-reload": "^1.4.0"
   },
   "dependencies": {
-    "electron-json-storage": "^4.1.6",
     "electron-log": "^3.0.1",
+    "electron-store": "^2.0.0",
     "jquery": "^3.3.1"
   }
 }
