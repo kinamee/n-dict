@@ -128,6 +128,14 @@ app.on('ready', () => {
             label: 'About',
             click() {
                 /* open about dialog */
+                const { dialog } = require('electron')
+                let options  = {
+                    buttons: ["Close"],
+                    message: "About",
+                    detail : "Nadict ver 1.029 beta"
+                    //icon : "icon/ndic_ico.png"
+                }
+                const response = dialog.showMessageBox(options);
             }
         },
         { type: 'separator' },
@@ -235,8 +243,15 @@ function open_dict() {
     /* show and hide toggle */
     if (win_dict.isVisible())
         win_dict.hide()
-    else
+    else {
+        search = ''
+        const { clipboard } = require('electron')
+        copied = clipboard.readText()
+        if (copied.length < 21)
+            search = copied
+        win_dict.webContents.send('main-to-dict', search)
         win_dict.show()
+    }
 }
 
 

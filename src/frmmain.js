@@ -17,10 +17,16 @@ webview.addEventListener('dom-ready', () => {
   webview.insertCSS('body::-webkit-scrollbar { display: none; }')
   webview.setZoomLevel(0);
   webview.executeJavaScript('document.getElementById("main_input").focus();')
-
 })
 
 /* document ready */
 $(document).ready(function() {
     //console.log('document ready')
+})
+
+ipc_renderer.on('main-to-dict', function (event, arg) {
+  //console.log('ipc-to-tdd message received: ' + arg)
+  webview.focus()
+  webview.executeJavaScript('document.getElementById("main_input").focus();')
+  webview.executeJavaScript('document.getElementById("main_input").value="' + arg + '";')
 })
