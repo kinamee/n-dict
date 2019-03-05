@@ -10,13 +10,8 @@ const ipc_renderer = electron.ipcRenderer
 let $ = require('jquery')
 
 /* mousetrap for shortcut recording */
-//const mousetrap = require(path.resolve('src/js/mousetrap-master/mousetrap.js'))
 const mousetrap = require(path.join(path.dirname(__dirname), 'extraResources','mousetrap.js'))
 require(path.join(path.dirname(__dirname), 'extraResources','mousetrap-record.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/bind-dictionary/mousetrap-bind-dictionary.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/global-bind/mousetrap-global-bind.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/pause/mousetrap-pause.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/record/mousetrap-record.js'))
 
 /* storage setting */
 const store = require('electron-store');
@@ -25,7 +20,7 @@ const storage = new store();
 /* document ready */
 $(document).ready(function() {
     /* design init */
-    design_init()
+    mouse_pointer_init()
 
     /* load shortcut from config */
     shortcut_from_config = storage.get('shortcut')
@@ -33,7 +28,7 @@ $(document).ready(function() {
 })
 
 /* design init */
-function design_init() {
+function mouse_pointer_init() {
   /* mouse pointer to default */
   $('.grpbtnconfirm').css({ 'cursor': 'default' })
   $('.txtshortcut').css({ 'cursor': 'default' })
@@ -43,16 +38,26 @@ function design_init() {
 $('.txtshortcut').click(function(){
     //console.log('key recording..')
     $(this).text('Press any shortcut')
+    $('.txtconfirm').text('CANCEL')
     $('.txtmessage').css({ 'font-size': '14.0px' })
     $('.txtmessage').text('I\'m recording your key press..')
+
+    mouse_pointer_init()
 
     mousetrap.record(function(sequence) {
         $('.txtmessage').css({ 'font-size': '15.0px' })
         $('.txtmessage').text('Shortcut to open nadict')
+        $('.txtconfirm').text('CLOSE')
+        mouse_pointer_init()
 
         // sequence is an array like ['ctrl+k', 'c']
         shortcut_from_user = sequence.join('+')
         shortcut_from_user = shortcut_from_user.toUpperCase().replace(/META/g, 'CMD')
+
+        shortcut_from_config = storage.get('shortcut')
+        if (shortcut_from_config == shortcut_from_user) {
+            return
+        }
 
         $('.txtshortcut').text(shortcut_from_user)
         //log.info(shortcut_from_user)
@@ -62,18 +67,18 @@ $('.txtshortcut').click(function(){
     })
 })
 
-function return_back_to_original_message() {
-    $('.txtmessage').css({ 'font-size': '15.0px' })
-    $('.txtmessage').text('Shortcut to open nadict')
-}
-
-/* verify shortcut */
-function verify_shortcut(pstr_shortcut) {
-    //console.log('message to main "re-register shortcut and let me know if its completed"')
-}
-
-/* close */
+/* cancle or close */
 $('.grpbtnconfirm').click(function(){
+
+    txt_on_button = $('.txtconfirm').text()
+    if (txt_on_button == 'CANCEL') {
+        shortcut_from_config = storage.get('shortcut')
+        $('.txtconfirm').text('CLOSE')
+        $('.txtshortcut').text(shortcut_from_config)
+        mouse_pointer_init()
+        return
+    }
+
     var window = remote.getCurrentWindow();
     window.hide();
 })
