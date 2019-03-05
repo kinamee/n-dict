@@ -10,13 +10,8 @@ const ipc_renderer = electron.ipcRenderer
 let $ = require('jquery')
 
 /* mousetrap for shortcut recording */
-//const mousetrap = require(path.resolve('src/js/mousetrap-master/mousetrap.js'))
 const mousetrap = require(path.join(path.dirname(__dirname), 'extraResources','mousetrap.js'))
 require(path.join(path.dirname(__dirname), 'extraResources','mousetrap-record.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/bind-dictionary/mousetrap-bind-dictionary.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/global-bind/mousetrap-global-bind.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/pause/mousetrap-pause.js'))
-//require(path.resolve('src/js/mousetrap-master/plugins/record/mousetrap-record.js'))
 
 /* storage setting */
 const store = require('electron-store');
