@@ -1,2 +1,9 @@
-# n-dict
-    변경사항이 생길 때 GIT 상태 확인하기
+    N-DICT <Korean-English dictionary for Mac, Windows, Linux>
+
+    This application is built by "Node + Electron" framework for supporting cross-platform with the same source.
+
+    The binary is for Mac. However you can download the codes and built for your platform.
+
+
+
+
